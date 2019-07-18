@@ -1,0 +1,14 @@
+(ns compost.core)
+
+;; All of these things are function objects.
+;; It is complete folly to define a type for all of them.
+;; For the lazy ones all that is needed is an execution wrapper.
+;; The fast proof of concept version is something like a multimethod
+;; that dispatches on the type of the arguments,
+;; or one that just assumes everything is a map and uses the domain protocol...
+;; the latter is actually ridiculously easy to implement.
+
+(defn foo
+  "I don't do a whole lot."
+  [x]
+  (println x "Hello, World!"))
