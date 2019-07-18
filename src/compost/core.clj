@@ -1,4 +1,5 @@
-(ns compost.core)
+(ns compost.core
+  (:require [clojure.set]))
 
 
 (defprotocol DomainImage
@@ -15,18 +16,33 @@
   (image [this] this)
 
   clojure.lang.PersistentArrayMap
-  (domain [this] (keys this))
-  (image [this] (vals this))
+  (domain [this] (set (keys this)))
+  (image [this] (set (vals this)))
 
   clojure.lang.PersistentList$EmptyList
   (domain [this] #{})
   (image [this] #{}))
 
-(defn comp
+(defn comp'
   ([& fns] (if (every? set? fns)
              (apply clojure.set/intersection fns)
              (let [dom (domain (last fns))
-                   f   (apply comp fns)]
-               (reduce #(if-let [v (f %2)]
-                          (assoc %1 %2 v)
-                          %1) {} dom)))))
+                   f   (apply clojure.core/comp fns)]
+               (reduce #(let [value (f %2)]
+                          (if (nil? value)
+                            %1
+                            (assoc %1 %2 value)))
+                       {}
+                       dom)))))
+
+(defn comp''
+  ([& fns]
+   (if (every? set? fns)
+     (apply clojure.set/intersection fns)
+     (let [dom (domain (last fns))
+           f   (juxt identity (apply clojure.core/comp fns))]
+       (into {}
+             (clojure.core/comp
+              (map f)
+              (filter #(some? (second %))))
+             dom)))))
