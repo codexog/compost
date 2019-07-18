@@ -5,7 +5,7 @@
   (domain [this])
   (image [this]))
 
-(extend-protocol InspectableFunction
+(extend-protocol DomainImage
   clojure.lang.PersistentVector
   (domain [this] (set (range 0 (count this))))
   (image [this] (set this))
